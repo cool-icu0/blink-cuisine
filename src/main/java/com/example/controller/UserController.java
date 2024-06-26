@@ -3,9 +3,11 @@ package com.example.controller;
 
 import com.example.dto.LoginFormDTO;
 import com.example.dto.Result;
+import com.example.dto.UserDTO;
 import com.example.entity.UserInfo;
 import com.example.service.IUserInfoService;
 import com.example.service.IUserService;
+import com.example.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,8 +64,11 @@ public class UserController {
 
     @GetMapping("/me")
     public Result me(){
-        // TODO 获取当前登录的用户并返回
-        return Result.fail("功能未完成");
+        //  获取当前登录的用户并返回
+        UserDTO user = UserHolder.getUser();
+        System.out.println("这个是ThreadLocal的user:"+user);
+
+        return Result.ok(user);
     }
 
     @GetMapping("/info/{id}")

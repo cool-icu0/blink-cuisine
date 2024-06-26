@@ -1,9 +1,11 @@
 package com.example.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.dto.LoginFormDTO;
 import com.example.dto.Result;
+import com.example.dto.UserDTO;
 import com.example.entity.User;
 import com.example.mapper.UserMapper;
 import com.example.service.IUserService;
@@ -52,22 +54,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             //2.如果不符合返回错误信息
             return Result.fail("手机号格式错误");
         }
-        //2.校验验证码
+        //3.校验验证码
         Object cacheCode = session.getAttribute("code");
         String code = loginForm.getCode();
         if (cacheCode == null || !cacheCode.toString().equals(code)){
-            //3.不一致，报错
+            //4.不一致，报错
             return Result.fail("验证码错误");
         }
-        //4.一致，使用手机号查询用户
+        //5.一致，使用手机号查询用户
         User user = query().eq("phone", phone).one();
-        //5.验证用户是否存在
+        //6.验证用户是否存在
         if (user == null){
-            //6.用户不存在，创建新用户并保存
+            //7.用户不存在，创建新用户并保存
             user = createUserWithPhone(phone);
         }
-        //7.保存用户id到session
-        session.setAttribute("user",user);
+        //8.保存用户id到session
+//        session.setAttribute("user",user);
+        UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
+        session.setAttribute("user",userDTO);
+
+        //9.返回登录成功
         return Result.ok();
     }
 
