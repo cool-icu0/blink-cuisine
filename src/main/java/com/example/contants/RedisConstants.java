@@ -1,4 +1,4 @@
-package com.example.utils;
+package com.example.contants;
 
 public class RedisConstants {
     public static final String LOGIN_CODE_KEY = "login:code:";

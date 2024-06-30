@@ -3,6 +3,7 @@ package com.example.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.contants.RedisConstants;
 import com.example.dto.Result;
 import com.example.entity.Shop;
 import com.example.service.IShopService;
@@ -33,7 +34,7 @@ public class ShopController {
      */
     @GetMapping("/{id}")
     public Result queryShopById(@PathVariable("id") Long id) {
-        return Result.ok(shopService.getById(id));
+        return shopService.queryById(id);
     }
 
     /**
@@ -57,8 +58,8 @@ public class ShopController {
     @PutMapping
     public Result updateShop(@RequestBody Shop shop) {
         // 写入数据库
-        shopService.updateById(shop);
-        return Result.ok();
+
+        return shopService.update(shop);
     }
 
     /**
