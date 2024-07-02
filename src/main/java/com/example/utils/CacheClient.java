@@ -84,7 +84,8 @@ public class CacheClient {
         }
         // 4.命中，需要先把json反序列化为对象
         RedisData redisData = JSONUtil.toBean(json, RedisData.class);
-        R r = JSONUtil.toBean((JSONObject) redisData.getData(), type);
+        JSONObject data = (JSONObject) redisData.getData();
+        R r = JSONUtil.toBean(data, type);
         LocalDateTime expireTime = redisData.getExpireTime();
         // 5.判断是否过期
         if(expireTime.isAfter(LocalDateTime.now())) {

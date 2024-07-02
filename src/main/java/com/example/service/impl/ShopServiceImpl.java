@@ -1,24 +1,16 @@
 package com.example.service.impl;
 
-import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.example.dto.Result;
 import com.example.entity.Shop;
 import com.example.mapper.ShopMapper;
 import com.example.service.IShopService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.utils.CacheClient;
-import com.example.utils.RedisData;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.contants.RedisConstants.*;
@@ -42,15 +34,15 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     @Override
     public Result queryById(Long id) {
         //解决缓存穿透
-//        Shop shop = cacheClient
-//                .queryWithPassThrough(
-//                        CACHE_SHOP_KEY,
-//                        id,
-//                        Shop.class,
-//                        this::getById,//全部写是id2->getById(id2)
-//                        CACHE_SHOP_TTL,
-//                        TimeUnit.MINUTES
-//                );
+        Shop shop = cacheClient
+                .queryWithPassThrough(
+                        CACHE_SHOP_KEY,
+                        id,
+                        Shop.class,
+                        this::getById,//全部写是id2->getById(id2)
+                        CACHE_SHOP_TTL,
+                        TimeUnit.MINUTES
+                );
         //互斥锁解决缓存击穿
 //        Shop shop = cacheClient
 //                .queryWithMutex(
@@ -62,15 +54,18 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
 //                        TimeUnit.SECONDS
 //                );
         //逻辑过期缓存击穿
-        Shop shop = cacheClient
-                .queryWithLogicalExpire(
-                        CACHE_SHOP_KEY,
-                        id,
-                        Shop.class,
-                        this::getById,
-                        CACHE_SHOP_TTL,
-                        TimeUnit.SECONDS
-                );
+//        Shop shop = cacheClient
+//                .queryWithLogicalExpire(
+//                        CACHE_SHOP_KEY,
+//                        id,
+//                        Shop.class,
+//                        this::getById,
+//                        CACHE_SHOP_TTL,
+//                        TimeUnit.SECONDS
+//                );
+        if (shop == null) {
+            return Result.fail("店铺不存在！");
+        }
         return Result.ok(shop);
     }
     //缓存击穿的加锁方法
