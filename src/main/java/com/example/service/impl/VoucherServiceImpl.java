@@ -7,6 +7,7 @@ import com.example.mapper.VoucherMapper;
 import com.example.entity.SeckillVoucher;
 import com.example.service.ISeckillVoucherService;
 import com.example.service.IVoucherService;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,6 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
 
     @Resource
     private ISeckillVoucherService seckillVoucherService;
-
     @Override
     public Result queryVoucherOfShop(Long shopId) {
         // 查询优惠券信息
