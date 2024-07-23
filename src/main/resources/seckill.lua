@@ -7,6 +7,8 @@
 local voucherId = ARGV[1]
 -- 1.2 用户id
 local userId = ARGV[2]
+-- 1.3 订单id
+local orderId = ARGV[3]
 -- 2.数据key
 -- 2.1 库存key
 local stockKey = 'seckill:stock:' .. voucherId
