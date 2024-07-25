@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.dto.Result;
 import com.example.dto.UserDTO;
 import com.example.entity.Blog;
+import com.example.entity.Follow;
 import com.example.entity.User;
 import com.example.mapper.BlogMapper;
 import com.example.service.IBlogService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.service.IFollowService;
 import com.example.service.IUserService;
 import com.example.utils.SystemConstants;
 import com.example.utils.UserHolder;
@@ -40,6 +42,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     private IUserService userService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private IFollowService followService;
     @Override
     public Result queryBlogById(Long id) {
         // 1.查询blog
@@ -134,6 +138,31 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
                 .collect(Collectors.toList());
         // 4.返回
         return Result.ok(userDTOS);
+    }
+    //保存探店博文
+    @Override
+    public Result saveBlog(Blog blog) {
+        // 获取登录用户
+        UserDTO user = UserHolder.getUser();
+        blog.setUserId(user.getId());
+        // 保存探店博文
+        boolean isSuccess = save(blog);
+        if (isSuccess){
+            //先查出所有的粉丝 select * from tb_follow where follow_user_id = ?
+            List<Follow> follows =followService.query().eq("follow_user_id", user.getId()).list();
+            //推送笔记id给所有的粉丝
+            for(Follow follow : follows){
+                //获取粉丝的id
+                Long userId = follow.getUserId();
+                //推送到每个粉丝的邮箱
+                String key = "feed:" + userId;
+                stringRedisTemplate.opsForZSet().add(key,blog.getId().toString(),System.currentTimeMillis());
+            }
+        }else {
+            return Result.fail("发布笔记失败");
+        }
+        // 返回id
+        return Result.ok(blog.getId());
     }
 
     private void queryBlogUser(Blog blog) {
