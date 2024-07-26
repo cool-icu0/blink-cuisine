@@ -12,13 +12,16 @@ import com.example.entity.User;
 import com.example.mapper.UserMapper;
 import com.example.service.IUserService;
 import com.example.utils.RegexUtils;
+import com.example.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -94,6 +97,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
         //9.返回登录成功
         return Result.ok(token);
+    }
+
+    @Override
+    public Result logout(HttpServletRequest request) {
+        //1.获取当前登录用户昵称
+        String nickName = UserHolder.getUser().getNickName();
+        //2.获取日期
+        LocalDateTime now = LocalDateTime.now();
+        // 3.获取请求头中的token
+        String token = request.getHeader("authorization");
+        //4.拼接对应的redis中的token位置login:token:xxx
+        String tokenKey = LOGIN_USER_KEY + token;
+        //5.删除redis中的token
+        stringRedisTemplate.delete(tokenKey);
+        log.info(now+"用户{"+nickName+"}退出成功！");
+//        UserHolder.removeUser();
+        return Result.ok();
     }
 
     private User createUserWithPhone(String phone) {
