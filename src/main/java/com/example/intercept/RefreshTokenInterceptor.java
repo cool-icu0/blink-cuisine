@@ -3,15 +3,12 @@ package com.example.intercept;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.example.dto.UserDTO;
-import com.example.entity.User;
 import com.example.utils.UserHolder;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +41,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         //5将查询到的Hash数据转为UserDTO对象
         UserDTO userDTO = BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
         //6.存在，保存用户信息到ThreadLocal
+        System.out.println("userDTO:"+userDTO);
         UserHolder.saveUser(userDTO);
         //7.刷新token有效期
         stringRedisTemplate.expire(key, LOGIN_USER_TTL, TimeUnit.MINUTES);
