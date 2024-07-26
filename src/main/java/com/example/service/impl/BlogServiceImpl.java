@@ -58,7 +58,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         // 2.查询blog有关的用户
         queryBlogUser(blog);
         // 3.查询blog是否被点赞
-        isBolgLiked(blog);
+        isBlogLiked(blog);
         return Result.ok(blog);
     }
 
@@ -72,12 +72,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         List<Blog> records = page.getRecords();
         // 查询用户
         records.forEach(blog -> {
-            this.isBolgLiked(blog);
+            this.isBlogLiked(blog);
             this.queryBlogUser(blog);
         });
         return Result.ok(records);
     }
-    public void isBolgLiked(Blog blog){
+    public void isBlogLiked(Blog blog){
         if (UserHolder.getUser() == null) {
             return;
         }
@@ -201,18 +201,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         //5.根据blogId查询blog
         String idStr = StrUtil.join(",", ids);
         List<Blog> blogs = query().in("id", ids).last("ORDER BY FIELD(id," + idStr + ")").list();
+
         blogs.forEach(blog -> {
             //5.1.查询blog有关的用户
             queryBlogUser(blog);
             //5.2.查询blog是否被点赞
-            isBolgLiked(blog);
+            isBlogLiked(blog);
         });
         //6.封装数据并返回
         ScrollResult result = new ScrollResult();
         result.setList(blogs);
         result.setOffset(os);
         result.setMinTime(minTime);
-        return null;
+        return Result.ok(result);
     }
 
     private void queryBlogUser(Blog blog) {
