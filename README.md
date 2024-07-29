@@ -42,14 +42,19 @@ Html + Axios + Vue + Nginx
 9.  消息通知：评论信息的显示与移除。
 #### 运行项目
 1. 导入sql文件
+
 2.在非中文目录中双击nginx.exe文件启动前端
+
 3.打开项目，启动redis，mysql
+
 4.创建streams消息队列，命令如下
+
 ```
 XGROUP CREATE stream.orders g1 0 MKSTREAM
 #   XGROUP CREATE 队列名称  组名称  起始id  MKSTREAM不存在则自动创建
 
 ```
+
 5.启动项目
 
 
