@@ -47,7 +47,7 @@ Html + Axios + Vue + Nginx
 
 3.打开项目，启动redis，mysql
 
-4.创建streams消息队列，命令如下
+4.在redis（命令行）中，创建streams消息队列，命令如下
 
 ```
 XGROUP CREATE stream.orders g1 0 MKSTREAM
